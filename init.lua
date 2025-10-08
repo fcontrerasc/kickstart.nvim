@@ -626,6 +626,15 @@ require('lazy').setup({
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
           end
+
+          if client and client.name == 'ruff' then
+            -- Disable hover in favor of Pyright
+            client.server_capabilities.hoverProvider = false
+          end
+
+          if client and client.name == 'clangd' then
+            client.server_capabilities.signatureHelpProvider = false
+          end
         end,
       })
 
@@ -637,10 +646,10 @@ require('lazy').setup({
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
-            [vim.diagnostic.severity.ERROR] = '󰅚 ',
-            [vim.diagnostic.severity.WARN] = '󰀪 ',
-            [vim.diagnostic.severity.INFO] = '󰋽 ',
-            [vim.diagnostic.severity.HINT] = '󰌶 ',
+            [vim.diagnostic.severity.ERROR] = '× ',
+            [vim.diagnostic.severity.WARN] = '! ',
+            [vim.diagnostic.severity.INFO] = 'i ',
+            [vim.diagnostic.severity.HINT] = '? ',
           },
         } or {},
         virtual_text = {
@@ -674,9 +683,32 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {
+          capabilities = capabilities,
+        },
+        docker_language_server = {},
+        autotools_ls = {},
+        cmake = {},
         -- gopls = {},
-        -- pyright = {},
+        ruff = {
+          init_options = {
+            settings = {
+              logLevel = 'debug',
+            },
+          },
+        },
+        pyright = {
+          settings = {
+            pyright = {
+              disableOrganizeImports = true,
+            },
+            python = {
+              analysis = {
+                ignore = { '*' },
+              },
+            },
+          },
+        },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -690,7 +722,7 @@ require('lazy').setup({
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
-          -- capabilities = {},
+          capabilities = capabilities,
           settings = {
             Lua = {
               completion = {
@@ -719,6 +751,17 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'docker-language-server', -- LSP for Dockerfiles, Compose files, and Bake files
+        'autotools-language-server', -- LSP for configure.ac, Makefile.am, Makefile
+        'cmakelang', -- Formatter Linter for cmake
+        'cmake-language-server', -- LSP for cmake
+        'cpplint', -- Linter for C/C++ Google style guide
+        'clangd', -- LSP for C/C++
+        'cpptools', -- DAP for C/C++ VS code externsion
+        'cortex-debug', -- DAP for Cortex-M Microcontrollers
+        'ruff', -- Linter for python
+        'pyright', -- LSP for python
+        'debugpy', -- DAP fot Python
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -770,9 +813,21 @@ require('lazy').setup({
         end
       end,
       formatters_by_ft = {
+        c = { 'astyle' },
+        cpp = { 'astyle' },
+        cs = { 'astyle' },
+        objc = { 'astyle' },
+        java = { 'astyle' },
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
+        python = {
+          -- To fix auto-fixable lint errors.
+          'ruff_fix',
+          -- To run the Ruff formatter.
+          'ruff_format',
+          -- To organize the imports.
+          'ruff_organize_imports',
+        },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -802,12 +857,12 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
         opts = {},
       },
@@ -853,7 +908,7 @@ require('lazy').setup({
       completion = {
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
-        documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        documentation = { auto_show = true, auto_show_delay_ms = 500 },
       },
 
       sources = {
@@ -872,7 +927,7 @@ require('lazy').setup({
       -- the rust implementation via `'prefer_rust_with_warning'`
       --
       -- See :h blink-cmp-config-fuzzy for more information
-      fuzzy = { implementation = 'lua' },
+      fuzzy = { implementation = 'prefer_rust_with_warning' },
 
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },
