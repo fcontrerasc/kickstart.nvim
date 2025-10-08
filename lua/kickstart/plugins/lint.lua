@@ -8,7 +8,7 @@ return {
       lint.linters_by_ft = {
         markdown = { 'markdownlint' },
         python = { 'ruff' },
-        cmake = { 'cmake' },
+        cmake = { 'cmake_lint' },
         c = { 'cpplint' },
         cpp = { 'cpplint' },
       }

@@ -626,15 +626,6 @@ require('lazy').setup({
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
           end
-
-          if client and client.name == 'ruff' then
-            -- Disable hover in favor of Pyright
-            client.server_capabilities.hoverProvider = false
-          end
-
-          if client and client.name == 'clangd' then
-            client.server_capabilities.signatureHelpProvider = false
-          end
         end,
       })
 
@@ -646,7 +637,7 @@ require('lazy').setup({
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
-            [vim.diagnostic.severity.ERROR] = '× ',
+            [vim.diagnostic.severity.ERROR] = '⨯ ',
             [vim.diagnostic.severity.WARN] = '! ',
             [vim.diagnostic.severity.INFO] = 'i ',
             [vim.diagnostic.severity.HINT] = '? ',
@@ -684,13 +675,19 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         clangd = {
-          capabilities = capabilities,
+          cmd = {},
+          capabilities = {
+            signatureHelpProvider = false,
+          },
         },
         docker_language_server = {},
         autotools_ls = {},
         cmake = {},
         -- gopls = {},
         ruff = {
+          capabilities = {
+            hoverProvider = false,
+          },
           init_options = {
             settings = {
               logLevel = 'debug',
@@ -722,7 +719,7 @@ require('lazy').setup({
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
-          capabilities = capabilities,
+          -- capabilities = {},
           settings = {
             Lua = {
               completion = {
@@ -757,11 +754,8 @@ require('lazy').setup({
         'cmake-language-server', -- LSP for cmake
         'cpplint', -- Linter for C/C++ Google style guide
         'clangd', -- LSP for C/C++
-        'cpptools', -- DAP for C/C++ VS code externsion
-        'cortex-debug', -- DAP for Cortex-M Microcontrollers
         'ruff', -- Linter for python
         'pyright', -- LSP for python
-        'debugpy', -- DAP fot Python
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -819,6 +813,7 @@ require('lazy').setup({
         objc = { 'astyle' },
         java = { 'astyle' },
         lua = { 'stylua' },
+        cmake = { 'cmake_format' },
         -- Conform can also run multiple formatters sequentially
         python = {
           -- To fix auto-fixable lint errors.
@@ -939,20 +934,29 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    -- 'folke/tokyonight.nvim',
+    'catppuccin/nvim',
+    name = 'catppuccin',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
+      -- ---@diagnostic disable-next-line: missing-fields
+      -- require('tokyonight').setup {
+      --   styles = {
+      --     comments = { italic = false }, -- Disable italics in comments
+      --   },
+      -- }
       ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
+      require('catppuccin').setup {
         styles = {
-          comments = { italic = false }, -- Disable italics in comments
+          comments = {},
         },
       }
 
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'catppuccin-mocha'
     end,
   },
 
@@ -1052,21 +1056,22 @@ require('lazy').setup({
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
-    icons = vim.g.have_nerd_font and {} or {
-      cmd = '⌘',
-      config = '🛠',
-      event = '📅',
-      ft = '📂',
-      init = '⚙',
-      keys = '🗝',
-      plugin = '🔌',
-      runtime = '💻',
-      require = '🌙',
-      source = '📄',
-      start = '🚀',
-      task = '📌',
-      lazy = '💤 ',
-    },
+    -- icons = vim.g.have_nerd_font and {} or {
+    --   cmd = '⌘',
+    --   config = '🛠',
+    --   event = '📅',
+    --   ft = '📂',
+    --   init = '⚙',
+    --   keys = '🗝',
+    --   plugin = '🔌',
+    --   runtime = '💻',
+    --   require = '🌙',
+    --   source = '📄',
+    --   start = '🚀',
+    --   task = '📌',
+    --   lazy = '💤 ',
+    -- },
+    icons = {},
   },
 })
 
