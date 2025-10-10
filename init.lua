@@ -681,7 +681,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         clangd = {
-          cmd = {},
+          cmd = { 'clangd', '--background-index', '--clang-tidy', '--log=verbose' },
           capabilities = {
             signatureHelpProvider = false,
           },
@@ -708,6 +708,18 @@ require('lazy').setup({
             python = {
               analysis = {
                 ignore = { '*' },
+              },
+            },
+          },
+        },
+        robotframework_ls = {},
+        bashls = {
+          settings = {
+            bashIde = {
+              enableSourceErrorDiagnostics = true,
+              shellcheckPath = 'shellcheck',
+              shfmt = {
+                path = 'shfmt',
               },
             },
           },
@@ -760,8 +772,13 @@ require('lazy').setup({
         'cmake-language-server', -- LSP for cmake
         'cpplint', -- Linter for C/C++ Google style guide
         'clangd', -- LSP for C/C++
+        'clang-format', -- Formatter for C/C++
         'ruff', -- Linter for python
         'pyright', -- LSP for python
+        'robotframework-lsp', -- LSP for Robot Framework
+        'bash-language-server', -- LSP for bash and shell
+        'shellcheck', -- Linter for shell
+        'shfmt', -- Formatter for shell
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -813,11 +830,13 @@ require('lazy').setup({
         end
       end,
       formatters_by_ft = {
-        c = { 'astyle' },
-        cpp = { 'astyle' },
-        cs = { 'astyle' },
-        objc = { 'astyle' },
-        java = { 'astyle' },
+        sh = { 'shfmt' },
+        c = { 'clang-format' },
+        cpp = { 'clang-format' },
+        cs = { 'clang-format' },
+        json = { 'clang-format' },
+        java = { 'clang-format' },
+        javascript = { 'clang-format' },
         lua = { 'stylua' },
         cmake = { 'cmake_format' },
         -- Conform can also run multiple formatters sequentially

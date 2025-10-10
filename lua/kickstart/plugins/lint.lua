@@ -5,12 +5,14 @@ return {
     event = { 'BufReadPre', 'BufNewFile' },
     config = function()
       local lint = require 'lint'
+
       lint.linters_by_ft = {
         markdown = { 'markdownlint' },
         python = { 'ruff' },
         cmake = { 'cmake_lint' },
         c = { 'cpplint' },
         cpp = { 'cpplint' },
+        sh = { 'shellcheck' },
       }
 
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
