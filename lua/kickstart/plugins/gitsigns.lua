@@ -2,9 +2,12 @@
 -- NOTE: gitsigns is already included in init.lua but contains only the base
 -- config. This will add also the recommended keymaps.
 
+local is_vscode = vim.g.vscode ~= nil
+
 return {
   {
     'lewis6991/gitsigns.nvim',
+    cond = not is_vscode,
     opts = {
       on_attach = function(bufnr)
         local gitsigns = require 'gitsigns'

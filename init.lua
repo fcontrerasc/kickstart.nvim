@@ -240,6 +240,9 @@ end
 local rtp = vim.opt.rtp
 rtp:prepend(lazypath)
 
+-- Variable for vscode extension
+local is_vscode = vim.g.vscode ~= nil
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -279,6 +282,7 @@ require('lazy').setup({
   -- See `:help gitsigns` to understand what the configuration keys do
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
+    cond = not is_vscode,
     opts = {
       signs = {
         add = { text = '+' },
@@ -305,6 +309,7 @@ require('lazy').setup({
 
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
+    cond = not is_vscode,
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     opts = {
       -- delay between pressing a key and opening which-key (milliseconds)
@@ -365,6 +370,7 @@ require('lazy').setup({
 
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
+    cond = not is_vscode,
     event = 'VimEnter',
     dependencies = {
       'nvim-lua/plenary.nvim',
@@ -476,6 +482,7 @@ require('lazy').setup({
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
     -- used for completion, annotations and signatures of Neovim apis
     'folke/lazydev.nvim',
+    cond = not is_vscode,
     ft = 'lua',
     opts = {
       library = {
@@ -487,6 +494,7 @@ require('lazy').setup({
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
+    cond = not is_vscode,
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
       -- Mason must be loaded before its dependents so we need to set it up here.
@@ -801,6 +809,7 @@ require('lazy').setup({
 
   { -- Autoformat
     'stevearc/conform.nvim',
+    cond = not is_vscode,
     event = { 'BufWritePre' },
     cmd = { 'ConformInfo' },
     keys = {
@@ -857,6 +866,7 @@ require('lazy').setup({
 
   { -- Autocompletion
     'saghen/blink.cmp',
+    cond = not is_vscode,
     event = 'VimEnter',
     version = '1.*',
     dependencies = {
@@ -961,6 +971,7 @@ require('lazy').setup({
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     -- 'folke/tokyonight.nvim',
     'catppuccin/nvim',
+    cond = not is_vscode,
     name = 'catppuccin',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
@@ -986,7 +997,15 @@ require('lazy').setup({
   },
 
   -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  {
+    'folke/todo-comments.nvim',
+    cond = not is_vscode,
+    event = 'VimEnter',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = {
+      signs = false,
+    },
+  },
 
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
@@ -1031,6 +1050,7 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    cond = not is_vscode,
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
