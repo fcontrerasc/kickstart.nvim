@@ -13,8 +13,8 @@ return {
         markdown = { 'markdownlint' },
         python = { 'ruff' },
         cmake = { 'cmake_lint' },
-        c = { 'cpplint' },
-        cpp = { 'cpplint' },
+        -- c = { 'cpplint' },
+        -- cpp = { 'cpplint' },
         sh = { 'shellcheck' },
       }
 

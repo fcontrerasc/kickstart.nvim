@@ -182,6 +182,11 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- Toggle diagnostics/linting
+vim.keymap.set('n', '<leader>td', function()
+  vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+end, { desc = '[T]oggle [D]iagnostics' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -647,8 +652,8 @@ require('lazy').setup({
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
         severity_sort = true,
-        float = { border = 'rounded', source = 'if_many' },
-        underline = { severity = vim.diagnostic.severity.ERROR },
+        float = { border = 'rounded', source = 'always' },
+        underline = true, -- Underline ALL diagnostics
         signs = vim.g.have_nerd_font and {
           text = {
             [vim.diagnostic.severity.ERROR] = '⨯ ',
@@ -780,7 +785,6 @@ require('lazy').setup({
         'cmake-language-server', -- LSP for cmake
         'cpplint', -- Linter for C/C++ Google style guide
         'clangd', -- LSP for C/C++
-        'clang-format', -- Formatter for C/C++
         'ruff', -- Linter for python
         'pyright', -- LSP for python
         'robotframework-lsp', -- LSP for Robot Framework
@@ -828,7 +832,7 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = false, cpp = false } -- clangd for formatting (clang-format)
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
@@ -840,12 +844,7 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         sh = { 'shfmt' },
-        c = { 'clang-format' },
-        cpp = { 'clang-format' },
-        cs = { 'clang-format' },
-        json = { 'clang-format' },
-        java = { 'clang-format' },
-        javascript = { 'clang-format' },
+        -- c, cpp, cs, json, java and javascript are formatted by clangd (clang-format)
         lua = { 'stylua' },
         cmake = { 'cmake_format' },
         -- Conform can also run multiple formatters sequentially
