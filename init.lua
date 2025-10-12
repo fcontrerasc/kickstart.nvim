@@ -862,13 +862,27 @@ require('lazy').setup({
       },
     },
   },
-
+  {
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    opts = {
+      suggestion = { enabled = false },
+      panel = { enabled = false },
+      filetypes = {
+        markdown = true,
+        help = true,
+      },
+    },
+  },
   { -- Autocompletion
     'saghen/blink.cmp',
     cond = not is_vscode,
     event = 'VimEnter',
     version = '1.*',
     dependencies = {
+      -- Copilot source for blink.cmp
+      'fang2hou/blink-copilot',
       -- Snippet Engine
       {
         'L3MON4D3/LuaSnip',
@@ -941,8 +955,14 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev' },
+        default = { 'lsp', 'path', 'copilot', 'snippets', 'lazydev' },
         providers = {
+          copilot = {
+            name = 'copilot',
+            module = 'blink-copilot',
+            score_offset = 100,
+            async = true,
+          },
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
         },
       },
