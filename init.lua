@@ -785,6 +785,7 @@ require('lazy').setup({
         'cmake-language-server', -- LSP for cmake
         'cpplint', -- Linter for C/C++ Google style guide
         'clangd', -- LSP for C/C++
+        'clang-format', -- Formatter for C/C++
         'ruff', -- Linter for python
         'pyright', -- LSP for python
         'robotframework-lsp', -- LSP for Robot Framework
@@ -832,7 +833,7 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = false, cpp = false } -- clangd for formatting (clang-format)
+        local disable_filetypes = { c = true, cpp = true }
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
@@ -844,7 +845,9 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         sh = { 'shfmt' },
-        -- c, cpp, cs, json, java and javascript are formatted by clangd (clang-format)
+        c = { 'clang-format' },
+        cpp = { 'clang-format' },
+        -- cs, json, java and javascript are formatted by clangd
         lua = { 'stylua' },
         cmake = { 'cmake_format' },
         -- Conform can also run multiple formatters sequentially
